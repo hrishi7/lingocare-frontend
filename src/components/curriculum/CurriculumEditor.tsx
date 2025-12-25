@@ -4,6 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { CurriculumHeader } from './CurriculumHeader';
 import { ModuleCard } from './ModuleCard';
 import { UploadDialog } from '../common/UploadDialog';
+import { StreamingProgress } from '../common/StreamingProgress';
 import { useCurriculumContext } from '../../context/CurriculumContext';
 import { api } from '../../services/api';
 
@@ -20,6 +21,7 @@ import { api } from '../../services/api';
 export const CurriculumEditor: React.FC = () => {
   const { curriculum, dispatch, isLoading, setIsLoading } = useCurriculumContext();
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [streamingStatus, setStreamingStatus] = useState<{ status: string; message: string; chunks: number } | null>(null);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
     message: '',
@@ -32,8 +34,29 @@ export const CurriculumEditor: React.FC = () => {
 
   const handleUpload = async (file: File) => {
     setIsLoading(true);
+    setStreamingStatus({ status: 'started', message: 'Starting...', chunks: 0 });
+    
     try {
-      const result = await api.generateCurriculum(file);
+      const result = await api.generateCurriculumStream(
+        file,
+        // Progress callback
+        (status, message) => {
+          setStreamingStatus(prev => ({
+            status,
+            message,
+            chunks: prev?.chunks || 0,
+          }));
+        },
+        // Chunk callback
+        (_chunk, index) => {
+          setStreamingStatus(prev => ({
+            status: prev?.status || 'ai_processing',
+            message: prev?.message || 'Processing...',
+            chunks: index + 1,
+          }));
+        }
+      );
+      
       dispatch({ type: 'SET_CURRICULUM', payload: result.curriculum });
       setSnackbar({
         open: true,
@@ -47,9 +70,9 @@ export const CurriculumEditor: React.FC = () => {
         message,
         severity: 'error',
       });
-      // throw error; // Removed re-throw to prevent unhandled rejection in tests/handlers
     } finally {
       setIsLoading(false);
+      setStreamingStatus(null);
     }
   };
 
@@ -170,6 +193,7 @@ export const CurriculumEditor: React.FC = () => {
         onClose={() => setUploadDialogOpen(false)}
         onUpload={handleUpload}
         isLoading={isLoading}
+        streamingStatus={streamingStatus}
       />
 
       {/* Snackbar for notifications */}

@@ -12,12 +12,14 @@ import {
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { StreamingProgress } from './StreamingProgress';
 
 interface UploadDialogProps {
   open: boolean;
   onClose: () => void;
   onUpload: (file: File) => Promise<void>;
   isLoading: boolean;
+  streamingStatus?: { status: string; message: string; chunks: number } | null;
 }
 
 /**
@@ -30,6 +32,7 @@ export const UploadDialog: React.FC<UploadDialogProps> = ({
   onClose,
   onUpload,
   isLoading,
+  streamingStatus,
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -118,62 +121,75 @@ export const UploadDialog: React.FC<UploadDialogProps> = ({
           </Alert>
         )}
 
-        {/* Drop Zone */}
-        <Box
-          onClick={() => fileInputRef.current?.click()}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          sx={{
-            border: '2px dashed',
-            borderColor: dragActive ? 'primary.main' : 'divider',
-            borderRadius: 2,
-            p: 4,
-            textAlign: 'center',
-            cursor: 'pointer',
-            backgroundColor: dragActive ? 'action.hover' : 'background.paper',
-            transition: 'all 0.2s ease',
-            '&:hover': {
-              borderColor: 'primary.main',
-              backgroundColor: 'action.hover',
-            },
-          }}
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,application/pdf"
-            onChange={handleInputChange}
-            style={{ display: 'none' }}
-          />
+        {/* Show streaming progress if available */}
+        {isLoading && streamingStatus ? (
+          <Box sx={{ mb: 2 }}>
+            <StreamingProgress
+              status={streamingStatus.status}
+              message={streamingStatus.message}
+              chunksReceived={streamingStatus.chunks}
+            />
+          </Box>
+        ) : (
+          <>
+            {/* Drop Zone */}
+            <Box
+              onClick={() => fileInputRef.current?.click()}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              sx={{
+                border: '2px dashed',
+                borderColor: dragActive ? 'primary.main' : 'divider',
+                borderRadius: 2,
+                p: 4,
+                textAlign: 'center',
+                cursor: 'pointer',
+                backgroundColor: dragActive ? 'action.hover' : 'background.paper',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  backgroundColor: 'action.hover',
+                },
+              }}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,application/pdf"
+                onChange={handleInputChange}
+                style={{ display: 'none' }}
+              />
 
-          {isLoading ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-              <CircularProgress color="primary" />
-              <Typography>Analyzing PDF with AI...</Typography>
+              {isLoading ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                  <CircularProgress color="primary" />
+                  <Typography>Analyzing PDF with AI...</Typography>
+                </Box>
+              ) : selectedFile ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                  <PictureAsPdfIcon sx={{ fontSize: 48, color: 'error.main' }} />
+                  <Typography variant="body1" fontWeight={500}>
+                    {selectedFile.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {(selectedFile.size / 1024).toFixed(1)} KB
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                  <CloudUploadIcon sx={{ fontSize: 48, color: 'primary.main' }} />
+                  <Typography variant="body1" fontWeight={500}>
+                    Drop your PDF here or click to browse
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Supports PDF files up to 10MB
+                  </Typography>
+                </Box>
+              )}
             </Box>
-          ) : selectedFile ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-              <PictureAsPdfIcon sx={{ fontSize: 48, color: 'error.main' }} />
-              <Typography variant="body1" fontWeight={500}>
-                {selectedFile.name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {(selectedFile.size / 1024).toFixed(1)} KB
-              </Typography>
-            </Box>
-          ) : (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-              <CloudUploadIcon sx={{ fontSize: 48, color: 'primary.main' }} />
-              <Typography variant="body1" fontWeight={500}>
-                Drop your PDF here or click to browse
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Supports PDF files up to 10MB
-              </Typography>
-            </Box>
-          )}
-        </Box>
+          </>
+        )}
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2 }}>
@@ -184,7 +200,7 @@ export const UploadDialog: React.FC<UploadDialogProps> = ({
           variant="contained"
           onClick={handleUpload}
           disabled={!selectedFile || isLoading}
-          startIcon={isLoading ? <CircularProgress size={16} /> : <CloudUploadIcon />}
+          startIcon={<CloudUploadIcon />}
         >
           {isLoading ? 'Generating...' : 'Generate Curriculum'}
         </Button>
