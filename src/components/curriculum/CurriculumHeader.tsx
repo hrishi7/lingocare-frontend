@@ -74,14 +74,14 @@ export const CurriculumHeader: React.FC<CurriculumHeaderProps> = ({ onUploadClic
           >
             Upload Curriculum
           </Button>
-          <Button
+          {/* <Button
             variant="contained"
             startIcon={<SaveIcon />}
             onClick={handleSave}
             sx={styles.saveButton}
           >
             Save
-          </Button>
+          </Button> */}
         </Box>
       </Box>
 

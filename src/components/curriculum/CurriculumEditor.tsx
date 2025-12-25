@@ -23,7 +23,12 @@ import type { Module } from '../../types/curriculum.types';
 export const CurriculumEditor: React.FC = () => {
   const { curriculum, dispatch, isLoading, setIsLoading } = useCurriculumContext();
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
-  const [streamingStatus, setStreamingStatus] = useState<{ status: string; message: string; chunks: number } | null>(null);
+  const [streamingStatus, setStreamingStatus] = useState<{ 
+    status: string; 
+    message: string; 
+    chunks: number;
+    modulesGenerated: number;
+  } | null>(null);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
     message: '',
@@ -39,7 +44,7 @@ export const CurriculumEditor: React.FC = () => {
     setUploadDialogOpen(false);
     
     setIsLoading(true);
-    setStreamingStatus({ status: 'started', message: 'Starting...', chunks: 0 });
+    setStreamingStatus({ status: 'started', message: 'Starting...', chunks: 0, modulesGenerated: 0 });
     
     // Reset curriculum for progressive rendering
     dispatch({ type:'RESET_FOR_PROGRESSIVE' });
@@ -63,6 +68,7 @@ export const CurriculumEditor: React.FC = () => {
             status,
             message,
             chunks: prev?.chunks || 0,
+            modulesGenerated: prev?.modulesGenerated || 0,
           }));
         },
         // Chunk callback - Progressive rendering
@@ -88,6 +94,7 @@ export const CurriculumEditor: React.FC = () => {
               ? `Generated ${parseState.completeModules.length} modules...`
               : prev?.message || 'Processing...',
             chunks: index + 1,
+            modulesGenerated: parseState.completeModules.length,
           }));
         }
       );
@@ -129,6 +136,7 @@ export const CurriculumEditor: React.FC = () => {
             status={streamingStatus.status}
             message={streamingStatus.message}
             chunksReceived={streamingStatus.chunks}
+            modulesGenerated={streamingStatus.modulesGenerated}
           />
         </Box>
       )}
@@ -191,7 +199,11 @@ export const CurriculumEditor: React.FC = () => {
 
       {/* Modules */}
       <Box>
-        {curriculum.modules.length === 0 ? (
+        {curriculum.modules.length > 0 ? (
+          curriculum.modules.map((module, index) => (
+            <ModuleCard key={module.id} module={module} index={index} />
+          ))
+        ) : !isLoading ? (
           <Box sx={styles.emptyStateContainer}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
               No modules yet
@@ -209,17 +221,14 @@ export const CurriculumEditor: React.FC = () => {
               </Button>
               <Button
                 variant="outlined"
+                disabled={isLoading}
                 onClick={() => setUploadDialogOpen(true)}
               >
                 Upload PDF
               </Button>
             </Box>
           </Box>
-        ) : (
-          curriculum.modules.map((module, index) => (
-            <ModuleCard key={module.id} module={module} index={index} />
-          ))
-        )}
+        ) : null}
 
         {/* Add Module Button (when modules exist) */}
         {curriculum.modules.length > 0 && (
@@ -266,17 +275,17 @@ const styles = {
   container: { 
     py: 4 
   },
-  progressBanner: {
-    position: 'sticky',
-    top: 0,
-    zIndex: 10,
-    mb: 3,
-    animation: 'slideDown 0.3s ease-out',
-    '@keyframes slideDown': {
-      '0%': { transform: 'translateY(-100%)', opacity: 0 },
-      '100%': { transform: 'translateY(0)', opacity: 1 },
-    },
-  },
+  // progressBanner: {
+  //   position: 'sticky',
+  //   top: 0,
+  //   zIndex: 10,
+  //   mb: 3,
+  //   animation: 'slideDown 0.3s ease-out',
+  //   '@keyframes slideDown': {
+  //     '0%': { transform: 'translateY(-100%)', opacity: 0 },
+  //     '100%': { transform: 'translateY(0)', opacity: 1 },
+  //   },
+  // },
   tabsContainer: {
     display: 'flex',
     flexDirection: { xs: 'column', md: 'row' },
@@ -332,6 +341,20 @@ const styles = {
     borderRadius: 2, 
     ml: { xs: 0, md: 2 }, 
     flexGrow: { xs: 1, md: 0 } 
+  },
+  progressBanner: {
+    position: 'sticky',
+    top: 16,
+    zIndex: 1100,
+    mb: 4,
+    mx: 'auto',
+    maxWidth: '800px',
+    width: '100%',
+    animation: 'slideDown 0.5s ease-out',
+    '@keyframes slideDown': {
+      '0%': { transform: 'translateY(-100%)', opacity: 0 },
+      '100%': { transform: 'translateY(0)', opacity: 1 },
+    },
   },
   emptyStateContainer: {
     textAlign: 'center',

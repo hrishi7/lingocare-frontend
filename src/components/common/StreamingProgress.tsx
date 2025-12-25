@@ -7,13 +7,14 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
  * Streaming Progress Component
  * 
  * Shows real-time progress during curriculum generation with streaming.
- * Displays current stage, progress message, and visual indicators.
+ * Displays current stage, progress message, and factual stats.
  */
 
 interface StreamingProgressProps {
   status: string;
   message: string;
   chunksReceived?: number;
+  modulesGenerated?: number;
 }
 
 const getStatusDisplay = (status: string): { label: string; color: 'default' | 'primary' | 'success' } => {
@@ -40,10 +41,11 @@ const getStatusDisplay = (status: string): { label: string; color: 'default' | '
 export const StreamingProgress: React.FC<StreamingProgressProps> = ({ 
   status, 
   message, 
-  chunksReceived = 0 
+  chunksReceived = 0,
+  modulesGenerated = 0,
 }) => {
   const statusDisplay = getStatusDisplay(status);
-  const isActive = !['completed', 'pdf_parsed'].includes(status);
+  const isActive = !['completed', 'error'].includes(status);
 
   return (
     <Box sx={styles.container}>
@@ -56,11 +58,16 @@ export const StreamingProgress: React.FC<StreamingProgressProps> = ({
           size="small"
           sx={styles.chip}
         />
-        {chunksReceived > 0 && (
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          {modulesGenerated > 0 && (
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+              {modulesGenerated} modules
+            </Typography>
+          )}
           <Typography variant="caption" color="text.secondary">
-            {chunksReceived} chunks received
+            {chunksReceived} chunks
           </Typography>
-        )}
+        </Box>
       </Box>
 
       {/* Progress message */}
@@ -68,9 +75,12 @@ export const StreamingProgress: React.FC<StreamingProgressProps> = ({
         {message}
       </Typography>
 
-      {/* Progress bar */}
+      {/* Determinate bar only when active */}
       {isActive && (
-        <LinearProgress sx={styles.progress} />
+        <LinearProgress 
+          variant="indeterminate"
+          sx={styles.progress} 
+        />
       )}
     </Box>
   );
@@ -78,27 +88,33 @@ export const StreamingProgress: React.FC<StreamingProgressProps> = ({
 
 const styles = {
   container: {
-    p: 2,
-    borderRadius: 2,
-    bgcolor: 'background.paper',
+    p: 2.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backdropFilter: 'blur(10px)',
+    borderRadius: 3,
+    boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
     border: '1px solid',
     borderColor: 'divider',
+    width: '100%',
+    boxSizing: 'border-box',
   },
   header: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    mb: 1,
+    mb: 2,
   },
   chip: {
-    fontWeight: 600,
+    fontWeight: 700,
   },
   message: {
-    mb: 1.5,
+    mb: 2,
     color: 'text.primary',
+    fontWeight: 500,
   },
   progress: {
-    borderRadius: 1,
+    borderRadius: 2,
     height: 6,
+    backgroundColor: 'rgba(0,0,0,0.05)',
   },
 };
