@@ -13,7 +13,8 @@ export default defineConfig({
         port: 5173,
         proxy: {
             '/api': {
-                target: 'https://lingocare-backend.onrender.com/',
+                target: 'http://localhost:4000',
+                // target: 'https://lingocare-backend.onrender.com/',
                 changeOrigin: true,
             },
         },
