@@ -56,9 +56,9 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
     <Box
       data-testid={`topic-${topic.id}`}
       sx={{
-        ml: 3,
+        ml: { xs: 1.5, sm: 3 },
         mt: 2,
-        pl: 2,
+        pl: 2, // Restored to 2 (16px) for alignment
         borderLeft: '3px solid',
         borderColor: 'primary.main',
         position: 'relative',
@@ -76,18 +76,25 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
             transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
             transition: 'transform 0.2s',
             mt: 0.5,
+            p: { xs: 0.5, sm: 1 }
           }}
         >
           <ExpandMoreIcon />
         </IconButton>
 
-        <Box sx={{ flex: 1 }}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
           <InlineEdit
             value={topic.title}
             onSave={handleTitleChange}
             placeholder={`Topic ${index + 1} - Click to add title`}
             variant="h6"
             testId={`topic-title-${topic.id}`}
+            sx={{
+              '& .MuiTypography-root': {
+                fontSize: { xs: '1rem', sm: '1.25rem' },
+                wordBreak: 'break-word'
+              }
+            }}
           />
           <InlineEdit
             value={topic.description}
@@ -104,7 +111,7 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
         <Box
           className="topic-actions"
           sx={{
-            opacity: 0,
+            opacity: { xs: 1, sm: 0 },
             transition: 'opacity 0.2s ease',
             display: 'flex',
             gap: 0.5,
@@ -141,7 +148,7 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
             onClick={handleAddLesson}
             size="small"
             sx={{
-              ml: 3,
+              ml: { xs: 1, sm: 3 },
               mt: 1,
               color: 'text.secondary',
               textTransform: 'none',

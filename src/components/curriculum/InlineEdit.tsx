@@ -124,11 +124,11 @@ export const InlineEdit: React.FC<InlineEditProps> = ({
           outline: 'none',
           color: isPlaceholder ? 'text.secondary' : 'text.primary',
           fontStyle: isPlaceholder ? 'italic' : 'normal',
-          minWidth: 100,
+          minWidth: '50px', // Reduced min-width to avoid overflow on very small screens
           // borderBottom: isEditing ? '2px solid' : '2px solid transparent',
           borderColor: isEditing ? 'primary.main' : 'transparent',
           transition: 'border-color 0.2s ease',
-          whiteSpace: multiline ? 'pre-wrap' : 'nowrap',
+          whiteSpace: 'pre-wrap', // Allow wrapping for responsive behavior
           wordBreak: 'break-word',
           '&:focus': {
             color: 'text.primary',

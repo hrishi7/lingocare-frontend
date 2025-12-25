@@ -46,8 +46,10 @@ export const CurriculumHeader: React.FC<CurriculumHeaderProps> = ({ onUploadClic
       <Box
         sx={{
           display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          gap: { xs: 2, sm: 0 },
           mb: 2,
         }}
       >
@@ -58,13 +60,13 @@ export const CurriculumHeader: React.FC<CurriculumHeaderProps> = ({ onUploadClic
           </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
           <Button
             variant="outlined"
             startIcon={<UploadFileIcon />}
             onClick={onUploadClick}
             disabled={isLoading}
-            sx={{ borderRadius: 2 }}
+            sx={{ borderRadius: 2, flexGrow: { xs: 1, sm: 0 } }}
           >
             Upload Curriculum
           </Button>
@@ -72,7 +74,7 @@ export const CurriculumHeader: React.FC<CurriculumHeaderProps> = ({ onUploadClic
             variant="contained"
             startIcon={<SaveIcon />}
             onClick={handleSave}
-            sx={{ borderRadius: 2 }}
+            sx={{ borderRadius: 2, flexGrow: { xs: 1, sm: 0 } }}
           >
             Save
           </Button>
@@ -80,7 +82,7 @@ export const CurriculumHeader: React.FC<CurriculumHeaderProps> = ({ onUploadClic
       </Box>
 
       {/* Title and Description */}
-      <Box sx={{ maxWidth: 800 }}>
+      <Box sx={{ maxWidth: 800, width: '100%' }}>
         <InlineEdit
           value={curriculum.title}
           onSave={handleTitleChange}
@@ -90,6 +92,8 @@ export const CurriculumHeader: React.FC<CurriculumHeaderProps> = ({ onUploadClic
           sx={{
             '& .MuiTypography-root': {
               fontWeight: 700,
+              fontSize: { xs: '1.5rem', sm: '2.125rem' },
+              lineHeight: 1.2, // Improve line height for wrapping text
             },
           }}
         />
@@ -105,7 +109,7 @@ export const CurriculumHeader: React.FC<CurriculumHeaderProps> = ({ onUploadClic
       </Box>
 
       {/* Progress Indicator */}
-      <Box sx={{ mt: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
+      <Box sx={{ mt: 2, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
         <Typography
           variant="body2"
           sx={{

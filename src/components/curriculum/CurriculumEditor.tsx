@@ -59,52 +59,67 @@ export const CurriculumEditor: React.FC = () => {
       <CurriculumHeader onUploadClick={() => setUploadDialogOpen(true)} />
 
       {/* Tabs - Simplified for assignment scope */}
+      {/* Tabs */}
       <Box
         sx={{
           display: 'flex',
-          gap: 3,
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: { xs: 2, md: 3 },
           mb: 3,
           borderBottom: '1px solid',
           borderColor: 'divider',
           pb: 1,
+          alignItems: { xs: 'flex-start', md: 'center' },
         }}
       >
-        <Typography
-          variant="body1"
-          sx={{
-            fontWeight: 600,
-            color: 'primary.main',
-            borderBottom: '2px solid',
-            borderColor: 'primary.main',
-            pb: 1,
-            cursor: 'pointer',
-          }}
-        >
-          Structure
-        </Typography>
-        <Typography
-          variant="body1"
-          sx={{
-            color: 'text.secondary',
-            cursor: 'pointer',
-            '&:hover': { color: 'text.primary' },
-          }}
-        >
-          Materials
-        </Typography>
-        <Typography
-          variant="body1"
-          sx={{
-            color: 'text.secondary',
-            cursor: 'pointer',
-            '&:hover': { color: 'text.primary' },
-          }}
-        >
-          Instructors
-        </Typography>
+        <Box sx={{ display: 'flex', gap: 3, overflow: 'auto', width: { xs: '100%', md: 'auto' }, pb: { xs: 1, md: 0 } }}>
+          <Typography
+            variant="body1"
+            sx={{
+              fontWeight: 600,
+              color: 'primary.main',
+              borderBottom: '2px solid',
+              borderColor: 'primary.main',
+              pb: 1,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Structure
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: 'text.secondary',
+              cursor: 'pointer',
+              '&:hover': { color: 'text.primary' },
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Materials
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: 'text.secondary',
+              cursor: 'pointer',
+              '&:hover': { color: 'text.primary' },
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Instructors
+          </Typography>
+        </Box>
 
         {/* Right side - Filter buttons */}
-        <Box sx={{ ml: 'auto', display: 'flex', gap: 1, alignItems: 'center' }}>
+        <Box sx={{ 
+          ml: { xs: 0, md: 'auto' }, 
+          display: 'flex', 
+          gap: 1, 
+          alignItems: 'center',
+          width: { xs: '100%', md: 'auto' },
+          flexWrap: 'wrap',
+        }}>
           <Button
             size="small"
             variant="contained"
@@ -128,7 +143,7 @@ export const CurriculumEditor: React.FC = () => {
             variant="outlined"
             startIcon={<AddIcon />}
             onClick={handleAddModule}
-            sx={{ borderRadius: 2, ml: 2 }}
+            sx={{ borderRadius: 2, ml: { xs: 0, md: 2 }, flexGrow: { xs: 1, md: 0 } }}
           >
             Add Module
           </Button>

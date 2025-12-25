@@ -45,11 +45,11 @@ export const LessonCard: React.FC<LessonCardProps> = ({ lesson, moduleId, topicI
     <Box
       data-testid={`lesson-${lesson.id}`}
       sx={{
-        pl: 3,
+        pl: { xs: 2, sm: 3 }, // Restored/Adjusted for alignment
         py: 1.5,
         borderLeft: '2px solid',
         borderColor: 'primary.light',
-        ml: 2,
+        ml: { xs: 1.5, sm: 2 }, // Adjusted for alignment
         position: 'relative',
         '&:hover .lesson-actions': {
           opacity: 1,
@@ -58,7 +58,7 @@ export const LessonCard: React.FC<LessonCardProps> = ({ lesson, moduleId, topicI
     >
       {/* Lesson Header */}
       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-        <Box sx={{ flex: 1 }}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
           <InlineEdit
             value={lesson.title}
             onSave={handleTitleChange}
@@ -68,6 +68,7 @@ export const LessonCard: React.FC<LessonCardProps> = ({ lesson, moduleId, topicI
             sx={{
               '& .MuiTypography-root': {
                 fontWeight: 500,
+                wordBreak: 'break-word'
               },
             }}
           />
@@ -86,7 +87,7 @@ export const LessonCard: React.FC<LessonCardProps> = ({ lesson, moduleId, topicI
         <Box
           className="lesson-actions"
           sx={{
-            opacity: 0,
+            opacity: { xs: 1, sm: 0 },
             transition: 'opacity 0.2s ease',
             display: 'flex',
             gap: 0.5,

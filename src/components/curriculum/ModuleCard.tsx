@@ -66,7 +66,7 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({ module, index }) => {
         transition: 'all 0.2s ease',
       }}
     >
-      <CardContent sx={{ pb: expanded ? 2 : '16px !important' }}>
+      <CardContent sx={{ pb: expanded ? 2 : '16px !important', px: { xs: 1.5, sm: 2 } }}>
         {/* Module Header */}
         <Box
           sx={{
@@ -86,12 +86,13 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({ module, index }) => {
               transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
               transition: 'transform 0.2s',
               mt: 0.5,
+              p: { xs: 0.5, sm: 1 }
             }}
           >
             <ExpandMoreIcon />
           </IconButton>
 
-          <Box sx={{ flex: 1 }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <InlineEdit
               value={module.title}
               onSave={handleTitleChange}
@@ -103,6 +104,8 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({ module, index }) => {
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                   color: 'secondary.main',
+                  fontSize: { xs: '1rem', sm: '1.5rem' },
+                  wordBreak: 'break-word'
                 },
               }}
             />
@@ -121,7 +124,7 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({ module, index }) => {
           <Box
             className="module-actions"
             sx={{
-              opacity: 0,
+              opacity: { xs: 1, sm: 0 }, // Always visible on mobile
               transition: 'opacity 0.2s ease',
               display: 'flex',
               gap: 0.5,
@@ -158,7 +161,7 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({ module, index }) => {
               onClick={handleAddTopic}
               size="small"
               sx={{
-                ml: 5,
+                ml: { xs: 2, sm: 5 },
                 mt: 2,
                 color: 'text.secondary',
                 textTransform: 'none',

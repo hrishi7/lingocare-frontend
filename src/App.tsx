@@ -24,14 +24,15 @@ function App() {
               borderColor: 'divider',
             }}
           >
-            <Toolbar>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Toolbar sx={{ flexWrap: 'wrap', minHeight: { xs: 56, sm: 64 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', }}>
                 <Typography
                   variant="h5"
                   sx={{
                     fontWeight: 700,
                     color: 'primary.main',
                     letterSpacing: '-0.5px',
+                    fontSize: { xs: '1.25rem', sm: '1.5rem' }
                   }}
                 >
                   Lingo
@@ -42,13 +43,21 @@ function App() {
                     fontWeight: 700,
                     color: 'secondary.main',
                     letterSpacing: '-0.5px',
+                    fontSize: { xs: '1.25rem', sm: '1.5rem' }
                   }}
                 >
                   Care
                 </Typography>
               </Box>
               <Box sx={{ flexGrow: 1 }} />
-              <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 500 }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  color: 'text.primary', 
+                  fontWeight: 500,
+                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                }}
+              >
                 Programs
               </Typography>
             </Toolbar>
