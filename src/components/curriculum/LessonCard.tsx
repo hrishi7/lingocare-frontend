@@ -28,7 +28,7 @@ interface LessonCardProps {
  * @param {LessonCardProps} props - Component props
  * @returns {JSX.Element} The rendered LessonCard component
  */
-export const LessonCard: React.FC<LessonCardProps> = ({ lesson, moduleId, topicId, index }) => {
+export const LessonCard: React.FC<LessonCardProps> = React.memo(function LessonCard({ lesson, moduleId, topicId, index }) {
   const { dispatch } = useCurriculumContext();
 
   /**
@@ -108,7 +108,7 @@ export const LessonCard: React.FC<LessonCardProps> = ({ lesson, moduleId, topicI
       </Box>
     </Box>
   );
-};
+});
 
 const styles = {
   container: {

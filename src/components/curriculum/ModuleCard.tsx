@@ -28,7 +28,7 @@ interface ModuleCardProps {
  * @param {ModuleCardProps} props - Component props
  * @returns {JSX.Element} The rendered ModuleCard component
  */
-export const ModuleCard: React.FC<ModuleCardProps> = ({ module, index }) => {
+export const ModuleCard: React.FC<ModuleCardProps> = React.memo(function ModuleCard({ module, index }) {
   const { dispatch } = useCurriculumContext();
   const [expanded, setExpanded] = useState(true);
 
@@ -156,7 +156,7 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({ module, index }) => {
       </CardContent>
     </Card>
   );
-};
+});
 
 const styles = {
   card: {

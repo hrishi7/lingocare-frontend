@@ -30,7 +30,7 @@ interface TopicCardProps {
  * @param {TopicCardProps} props - Component props
  * @returns {JSX.Element} The rendered TopicCard component
  */
-export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) => {
+export const TopicCard: React.FC<TopicCardProps> = React.memo(function TopicCard({ topic, moduleId, index }) {
   const { dispatch } = useCurriculumContext();
   const [expanded, setExpanded] = useState(true);
 
@@ -154,7 +154,7 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
       </Collapse>
     </Box>
   );
-};
+});
 
 const styles = {
   container: {

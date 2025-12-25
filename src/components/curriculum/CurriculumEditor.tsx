@@ -5,6 +5,7 @@ import { CurriculumHeader } from './CurriculumHeader';
 import { ModuleCard } from './ModuleCard';
 import { UploadDialog } from '../common/UploadDialog';
 import { StreamingProgress } from '../common/StreamingProgress';
+import { LoadingSkeleton } from '../common/LoadingSkeleton';
 import { useCurriculumContext } from '../../context/CurriculumContext';
 import { api } from '../../services/api';
 import { extractCompleteModules } from '../../utils/incrementalParser';
@@ -59,6 +60,10 @@ export const CurriculumEditor: React.FC = () => {
     };
     let accumulatedText = '';
     
+    // Throttle streaming status updates to improve performance
+    let lastStatusUpdate = 0;
+    const STATUS_UPDATE_THROTTLE = 200; // ms - Update UI max 5 times per second
+    
     try {
       const result = await api.generateCurriculumStream(
         file,
@@ -88,14 +93,19 @@ export const CurriculumEditor: React.FC = () => {
           
           parseState = newState;
           
-          setStreamingStatus(prev => ({
-            status: prev?.status || 'ai_processing',
-            message: newModules.length > 0 
-              ? `Generated ${parseState.completeModules.length} modules...`
-              : prev?.message || 'Processing...',
-            chunks: index + 1,
-            modulesGenerated: parseState.completeModules.length,
-          }));
+          // Throttle status updates to reduce re-renders and improve performance
+          const now = Date.now();
+          if (now - lastStatusUpdate >= STATUS_UPDATE_THROTTLE || newModules.length > 0) {
+            lastStatusUpdate = now;
+            setStreamingStatus(prev => ({
+              status: prev?.status || 'ai_processing',
+              message: newModules.length > 0 
+                ? `Generated ${parseState.completeModules.length} modules...`
+                : prev?.message || 'Processing...',
+              chunks: index + 1,
+              modulesGenerated: parseState.completeModules.length,
+            }));
+          }
         }
       );
       
@@ -203,7 +213,9 @@ export const CurriculumEditor: React.FC = () => {
           curriculum.modules.map((module, index) => (
             <ModuleCard key={module.id} module={module} index={index} />
           ))
-        ) : !isLoading ? (
+        ) : isLoading ? (
+          <LoadingSkeleton count={1} />
+        ) : (
           <Box sx={styles.emptyStateContainer}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
               No modules yet
@@ -228,7 +240,7 @@ export const CurriculumEditor: React.FC = () => {
               </Button>
             </Box>
           </Box>
-        ) : null}
+        )}
 
         {/* Add Module Button (when modules exist) */}
         {curriculum.modules.length > 0 && (
