@@ -96,7 +96,7 @@ export const InlineEdit: React.FC<InlineEditProps> = ({
       onClick={handleClick}
       sx={{
         display: 'flex',
-        alignItems: 'flex-start',
+        alignItems: multiline ? 'flex-start' : 'center',
         gap: 1,
         cursor: 'text',
         borderRadius: 1,
@@ -146,7 +146,7 @@ export const InlineEdit: React.FC<InlineEditProps> = ({
             opacity: 0,
             color: 'text.secondary',
             transition: 'opacity 0.2s ease',
-            mt: variant === 'h4' ? 0.5 : 0,
+            mt: (multiline && variant === 'h4') ? 0.5 : 0,
           }}
         />
       )}
