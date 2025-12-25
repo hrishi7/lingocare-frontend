@@ -7,6 +7,8 @@ import { UploadDialog } from '../common/UploadDialog';
 import { StreamingProgress } from '../common/StreamingProgress';
 import { useCurriculumContext } from '../../context/CurriculumContext';
 import { api } from '../../services/api';
+import { extractCompleteModules } from '../../utils/incrementalParser';
+import type { Module } from '../../types/curriculum.types';
 
 /**
  * CurriculumEditor Component
@@ -33,8 +35,24 @@ export const CurriculumEditor: React.FC = () => {
   };
 
   const handleUpload = async (file: File) => {
+    // Close dialog immediately so user can see progressive rendering
+    setUploadDialogOpen(false);
+    
     setIsLoading(true);
     setStreamingStatus({ status: 'started', message: 'Starting...', chunks: 0 });
+    
+    // Reset curriculum for progressive rendering
+    dispatch({ type:'RESET_FOR_PROGRESSIVE' });
+    
+    // Track parsing state
+    let parseState: {
+      completeModules: Module[];
+      lastParsedIndex: number;
+    } = {
+      completeModules: [],
+      lastParsedIndex: 0,
+    };
+    let accumulatedText = '';
     
     try {
       const result = await api.generateCurriculumStream(
@@ -47,20 +65,39 @@ export const CurriculumEditor: React.FC = () => {
             chunks: prev?.chunks || 0,
           }));
         },
-        // Chunk callback
-        (_chunk, index) => {
+        // Chunk callback - Progressive rendering
+        (chunk, index) => {
+          accumulatedText += chunk;
+          
+          // Try to extract complete modules
+          const { modules: newModules, state: newState } = extractCompleteModules(
+            accumulatedText,
+            parseState
+          );
+          
+          // Add any new complete modules to UI
+          newModules.forEach(module => {
+            dispatch({ type: 'ADD_PROGRESSIVE_MODULE', payload: module });
+          });
+          
+          parseState = newState;
+          
           setStreamingStatus(prev => ({
             status: prev?.status || 'ai_processing',
-            message: prev?.message || 'Processing...',
+            message: newModules.length > 0 
+              ? `Generated ${parseState.completeModules.length} modules...`
+              : prev?.message || 'Processing...',
             chunks: index + 1,
           }));
         }
       );
       
+      // Finalize with complete curriculum (ensures title, description, etc.)
       dispatch({ type: 'SET_CURRICULUM', payload: result.curriculum });
+      
       setSnackbar({
         open: true,
-        message: `Curriculum generated successfully using ${result.aiProvider}!`,
+        message: `Curriculum generated successfully with ${result.curriculum.modules.length} modules using ${result.aiProvider}!`,
         severity: 'success',
       });
     } catch (error) {
@@ -84,6 +121,17 @@ export const CurriculumEditor: React.FC = () => {
     <Container maxWidth="lg" sx={styles.container}>
       {/* Header */}
       <CurriculumHeader onUploadClick={() => setUploadDialogOpen(true)} />
+
+      {/* Global Progress Banner - Shows during streaming */}
+      {isLoading && streamingStatus && (
+        <Box sx={styles.progressBanner}>
+          <StreamingProgress
+            status={streamingStatus.status}
+            message={streamingStatus.message}
+            chunksReceived={streamingStatus.chunks}
+          />
+        </Box>
+      )}
 
       {/* Tabs - Simplified for assignment scope */}
       {/* Tabs */}
@@ -193,7 +241,6 @@ export const CurriculumEditor: React.FC = () => {
         onClose={() => setUploadDialogOpen(false)}
         onUpload={handleUpload}
         isLoading={isLoading}
-        streamingStatus={streamingStatus}
       />
 
       {/* Snackbar for notifications */}
@@ -218,6 +265,17 @@ export const CurriculumEditor: React.FC = () => {
 const styles = {
   container: { 
     py: 4 
+  },
+  progressBanner: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 10,
+    mb: 3,
+    animation: 'slideDown 0.3s ease-out',
+    '@keyframes slideDown': {
+      '0%': { transform: 'translateY(-100%)', opacity: 0 },
+      '100%': { transform: 'translateY(0)', opacity: 1 },
+    },
   },
   tabsContainer: {
     display: 'flex',

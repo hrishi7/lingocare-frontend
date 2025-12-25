@@ -26,6 +26,20 @@ function curriculumReducer(state: Curriculum, action: CurriculumAction): Curricu
     case 'SET_CURRICULUM':
       return action.payload;
 
+    case 'RESET_FOR_PROGRESSIVE':
+      // Reset curriculum for progressive rendering
+      return {
+        ...initialCurriculum,
+        id: generateId(),
+      };
+
+    case 'ADD_PROGRESSIVE_MODULE':
+      // Add module progressively as it arrives from stream
+      return {
+        ...state,
+        modules: [...state.modules, action.payload],
+      };
+
     case 'UPDATE_CURRICULUM_TITLE':
       return { ...state, title: action.payload };
 

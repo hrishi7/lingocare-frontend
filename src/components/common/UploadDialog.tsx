@@ -12,14 +12,12 @@ import {
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import { StreamingProgress } from './StreamingProgress';
 
 interface UploadDialogProps {
   open: boolean;
   onClose: () => void;
   onUpload: (file: File) => Promise<void>;
   isLoading: boolean;
-  streamingStatus?: { status: string; message: string; chunks: number } | null;
 }
 
 /**
@@ -32,7 +30,6 @@ export const UploadDialog: React.FC<UploadDialogProps> = ({
   onClose,
   onUpload,
   isLoading,
-  streamingStatus,
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -121,19 +118,8 @@ export const UploadDialog: React.FC<UploadDialogProps> = ({
           </Alert>
         )}
 
-        {/* Show streaming progress if available */}
-        {isLoading && streamingStatus ? (
-          <Box sx={{ mb: 2 }}>
-            <StreamingProgress
-              status={streamingStatus.status}
-              message={streamingStatus.message}
-              chunksReceived={streamingStatus.chunks}
-            />
-          </Box>
-        ) : (
-          <>
-            {/* Drop Zone */}
-            <Box
+        {/* Drop Zone */}
+        <Box
               onClick={() => fileInputRef.current?.click()}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
@@ -188,8 +174,6 @@ export const UploadDialog: React.FC<UploadDialogProps> = ({
                 </Box>
               )}
             </Box>
-          </>
-        )}
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2 }}>

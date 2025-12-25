@@ -38,6 +38,8 @@ export type CurriculumAction =
   | { type: 'UPDATE_CURRICULUM_TITLE'; payload: string }
   | { type: 'UPDATE_CURRICULUM_DESCRIPTION'; payload: string }
   | { type: 'ADD_MODULE' }
+  | { type: 'ADD_PROGRESSIVE_MODULE'; payload: Module }
+  | { type: 'RESET_FOR_PROGRESSIVE' }
   | { type: 'UPDATE_MODULE'; payload: { moduleId: string; title?: string; description?: string } }
   | { type: 'DELETE_MODULE'; payload: string }
   | { type: 'ADD_TOPIC'; payload: string }
