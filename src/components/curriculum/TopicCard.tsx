@@ -8,22 +8,36 @@ import { InlineEdit } from './InlineEdit';
 import { LessonCard } from './LessonCard';
 import { useCurriculumContext } from '../../context/CurriculumContext';
 
+/**
+ * Props for TopicCard component.
+ */
 interface TopicCardProps {
+  /** The topic data to display */
   topic: Topic;
+  /** ID of the module this topic belongs to */
   moduleId: string;
+  /** Index of the topic in the parent array */
   index: number;
 }
 
 /**
  * TopicCard Component
  * 
- * Displays a topic with its lessons.
- * Supports expand/collapse for lessons.
+ * Displays a collapsible card for a curriculum topic, showing its title, description,
+ * and list of lessons. Topics are nested within modules and provide the mid-level
+ * structure in the curriculum hierarchy.
+ * 
+ * @param {TopicCardProps} props - Component props
+ * @returns {JSX.Element} The rendered TopicCard component
  */
 export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) => {
   const { dispatch } = useCurriculumContext();
   const [expanded, setExpanded] = useState(true);
 
+  /**
+   * Updates the topic title in the context.
+   * @param {string} title - The new title
+   */
   const handleTitleChange = (title: string) => {
     dispatch({
       type: 'UPDATE_TOPIC',
@@ -31,6 +45,10 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
     });
   };
 
+  /**
+   * Updates the topic description in the context.
+   * @param {string} description - The new description
+   */
   const handleDescriptionChange = (description: string) => {
     dispatch({
       type: 'UPDATE_TOPIC',
@@ -38,6 +56,9 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
     });
   };
 
+  /**
+   * Adds a new lesson to this topic.
+   */
   const handleAddLesson = () => {
     dispatch({
       type: 'ADD_LESSON',
@@ -45,6 +66,9 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
     });
   };
 
+  /**
+   * Deletes this topic from its parent module.
+   */
   const handleDelete = () => {
     dispatch({
       type: 'DELETE_TOPIC',
@@ -55,46 +79,26 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
   return (
     <Box
       data-testid={`topic-${topic.id}`}
-      sx={{
-        ml: { xs: 1.5, sm: 3 },
-        mt: 2,
-        pl: 2, // Restored to 2 (16px) for alignment
-        borderLeft: '3px solid',
-        borderColor: 'primary.main',
-        position: 'relative',
-        '&:hover .topic-actions': {
-          opacity: 1,
-        },
-      }}
+      sx={styles.container}
     >
       {/* Topic Header */}
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+      <Box sx={styles.headerContainer}>
         <IconButton
           size="small"
           onClick={() => setExpanded(!expanded)}
-          sx={{
-            transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
-            transition: 'transform 0.2s',
-            mt: 0.5,
-            p: { xs: 0.5, sm: 1 }
-          }}
+          sx={styles.expandButton(expanded)}
         >
           <ExpandMoreIcon />
         </IconButton>
 
-        <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Box sx={styles.contentContainer}>
           <InlineEdit
             value={topic.title}
             onSave={handleTitleChange}
             placeholder={`Topic ${index + 1} - Click to add title`}
             variant="h6"
             testId={`topic-title-${topic.id}`}
-            sx={{
-              '& .MuiTypography-root': {
-                fontSize: { xs: '1rem', sm: '1.25rem' },
-                wordBreak: 'break-word'
-              }
-            }}
+            sx={styles.titleEdit}
           />
           <InlineEdit
             value={topic.description}
@@ -103,25 +107,20 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
             variant="body2"
             testId={`topic-desc-${topic.id}`}
             multiline
-            sx={{ mt: 0.5, ml: 1 }}
+            sx={styles.descriptionEdit}
           />
         </Box>
 
         {/* Actions */}
         <Box
           className="topic-actions"
-          sx={{
-            opacity: { xs: 1, sm: 0 },
-            transition: 'opacity 0.2s ease',
-            display: 'flex',
-            gap: 0.5,
-          }}
+          sx={styles.actionsContainer}
         >
           <Tooltip title="Delete topic">
             <IconButton
               size="small"
               onClick={handleDelete}
-              sx={{ color: 'error.main' }}
+              sx={styles.deleteButton}
             >
               <DeleteOutlineIcon fontSize="small" />
             </IconButton>
@@ -131,7 +130,7 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
 
       {/* Lessons */}
       <Collapse in={expanded}>
-        <Box sx={{ mt: 1 }}>
+        <Box sx={styles.lessonsContainer}>
           {topic.lessons.map((lesson, lessonIndex) => (
             <LessonCard
               key={lesson.id}
@@ -147,16 +146,7 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
             startIcon={<AddIcon />}
             onClick={handleAddLesson}
             size="small"
-            sx={{
-              ml: { xs: 1, sm: 3 },
-              mt: 1,
-              color: 'text.secondary',
-              textTransform: 'none',
-              '&:hover': {
-                color: 'primary.main',
-                backgroundColor: 'action.hover',
-              },
-            }}
+            sx={styles.addLessonButton}
           >
             Add Lesson
           </Button>
@@ -164,4 +154,65 @@ export const TopicCard: React.FC<TopicCardProps> = ({ topic, moduleId, index }) 
       </Collapse>
     </Box>
   );
+};
+
+const styles = {
+  container: {
+    ml: { xs: 1.5, sm: 3 },
+    mt: 2,
+    pl: 2,
+    borderLeft: '3px solid',
+    borderColor: 'primary.main',
+    position: 'relative',
+    '&:hover .topic-actions': {
+      opacity: 1,
+    },
+  },
+  headerContainer: { 
+    display: 'flex', 
+    alignItems: 'flex-start', 
+    gap: 1 
+  },
+  expandButton: (expanded: boolean) => ({
+    transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+    transition: 'transform 0.2s',
+    mt: 0.5,
+    p: { xs: 0.5, sm: 1 }
+  }),
+  contentContainer: { 
+    flex: 1, 
+    minWidth: 0 
+  },
+  titleEdit: {
+    '& .MuiTypography-root': {
+      fontSize: { xs: '1rem', sm: '1.25rem' },
+      wordBreak: 'break-word'
+    }
+  },
+  descriptionEdit: { 
+    mt: 0.5, 
+    ml: 1 
+  },
+  actionsContainer: {
+    opacity: { xs: 1, sm: 0 },
+    transition: 'opacity 0.2s ease',
+    display: 'flex',
+    gap: 0.5,
+  },
+  deleteButton: { 
+    color: 'error.main' 
+  },
+  lessonsContainer: { 
+    mt: 1 
+  },
+  addLessonButton: {
+    ml: { xs: 1, sm: 3 },
+    mt: 1,
+    color: 'text.secondary',
+    textTransform: 'none',
+    '&:hover': {
+      color: 'primary.main',
+      backgroundColor: 'action.hover',
+    },
+  }
 };

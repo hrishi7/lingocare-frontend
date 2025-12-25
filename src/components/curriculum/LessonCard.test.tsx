@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import { ThemeProvider } from '@mui/material';
 import { LessonCard } from './LessonCard';
 import theme from '../../theme';
-import * as CurriculumContextObj from '../../context/CurriculumContext';
 
 // Mock the context hook
 const mockDispatch = vi.fn();

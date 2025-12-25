@@ -10,8 +10,12 @@ import { api } from '../../services/api';
 /**
  * CurriculumEditor Component
  * 
- * Main container for the curriculum creation/editing experience.
- * Coordinates all curriculum-related components.
+ * Main container for the curriculum creation and editing experience.
+ * This component coordinates the overall structure of the curriculum,
+ * managing the list of modules, handling file uploads for AI generation,
+ * and providing high-level controls for the curriculum.
+ * 
+ * @returns {JSX.Element} The rendered CurriculumEditor component.
  */
 export const CurriculumEditor: React.FC = () => {
   const { curriculum, dispatch, isLoading, setIsLoading } = useCurriculumContext();
@@ -54,88 +58,52 @@ export const CurriculumEditor: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={styles.container}>
       {/* Header */}
       <CurriculumHeader onUploadClick={() => setUploadDialogOpen(true)} />
 
       {/* Tabs - Simplified for assignment scope */}
       {/* Tabs */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' },
-          gap: { xs: 2, md: 3 },
-          mb: 3,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          pb: 1,
-          alignItems: { xs: 'flex-start', md: 'center' },
-        }}
-      >
-        <Box sx={{ display: 'flex', gap: 3, overflow: 'auto', width: { xs: '100%', md: 'auto' }, pb: { xs: 1, md: 0 } }}>
+      <Box sx={styles.tabsContainer}>
+        <Box sx={styles.tabsInnerContainer}>
           <Typography
             variant="body1"
-            sx={{
-              fontWeight: 600,
-              color: 'primary.main',
-              borderBottom: '2px solid',
-              borderColor: 'primary.main',
-              pb: 1,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
+            sx={styles.activeTab}
           >
             Structure
           </Typography>
           <Typography
             variant="body1"
-            sx={{
-              color: 'text.secondary',
-              cursor: 'pointer',
-              '&:hover': { color: 'text.primary' },
-              whiteSpace: 'nowrap',
-            }}
+            sx={styles.inactiveTab}
           >
             Materials
           </Typography>
           <Typography
             variant="body1"
-            sx={{
-              color: 'text.secondary',
-              cursor: 'pointer',
-              '&:hover': { color: 'text.primary' },
-              whiteSpace: 'nowrap',
-            }}
+            sx={styles.inactiveTab}
           >
             Instructors
           </Typography>
         </Box>
 
         {/* Right side - Filter buttons */}
-        <Box sx={{ 
-          ml: { xs: 0, md: 'auto' }, 
-          display: 'flex', 
-          gap: 1, 
-          alignItems: 'center',
-          width: { xs: '100%', md: 'auto' },
-          flexWrap: 'wrap',
-        }}>
+        <Box sx={styles.filterContainer}>
           <Button
             size="small"
             variant="contained"
-            sx={{ borderRadius: 3, minWidth: 'auto', px: 2 }}
+            sx={styles.filterButtonActive}
           >
             All
           </Button>
           <Button
             size="small"
-            sx={{ borderRadius: 3, minWidth: 'auto', px: 2, color: 'text.secondary' }}
+            sx={styles.filterButtonInactive}
           >
             Theory
           </Button>
           <Button
             size="small"
-            sx={{ borderRadius: 3, minWidth: 'auto', px: 2, color: 'text.secondary' }}
+            sx={styles.filterButtonInactive}
           >
             Practical
           </Button>
@@ -143,7 +111,7 @@ export const CurriculumEditor: React.FC = () => {
             variant="outlined"
             startIcon={<AddIcon />}
             onClick={handleAddModule}
-            sx={{ borderRadius: 2, ml: { xs: 0, md: 2 }, flexGrow: { xs: 1, md: 0 } }}
+            sx={styles.addModuleButtonMobile}
           >
             Add Module
           </Button>
@@ -153,23 +121,14 @@ export const CurriculumEditor: React.FC = () => {
       {/* Modules */}
       <Box>
         {curriculum.modules.length === 0 ? (
-          <Box
-            sx={{
-              textAlign: 'center',
-              py: 8,
-              backgroundColor: 'background.paper',
-              borderRadius: 2,
-              border: '2px dashed',
-              borderColor: 'divider',
-            }}
-          >
+          <Box sx={styles.emptyStateContainer}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
               No modules yet
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            <Typography variant="body2" color="text.secondary" sx={styles.emptyStateText}>
               Start building your curriculum by adding a module or uploading a PDF
             </Typography>
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+            <Box sx={styles.emptyStateActionContainer}>
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
@@ -198,16 +157,7 @@ export const CurriculumEditor: React.FC = () => {
             startIcon={<AddIcon />}
             onClick={handleAddModule}
             fullWidth
-            sx={{
-              mt: 2,
-              py: 2,
-              borderStyle: 'dashed',
-              borderWidth: 2,
-              '&:hover': {
-                borderWidth: 2,
-                borderStyle: 'dashed',
-              },
-            }}
+            sx={styles.addModuleButtonBottom}
           >
             Add Module
           </Button>
@@ -232,11 +182,102 @@ export const CurriculumEditor: React.FC = () => {
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbar.severity}
-          sx={{ width: '100%' }}
+          sx={styles.alert}
         >
           {snackbar.message}
         </Alert>
       </Snackbar>
     </Container>
   );
+};
+
+const styles = {
+  container: { 
+    py: 4 
+  },
+  tabsContainer: {
+    display: 'flex',
+    flexDirection: { xs: 'column', md: 'row' },
+    gap: { xs: 2, md: 3 },
+    mb: 3,
+    borderBottom: '1px solid',
+    borderColor: 'divider',
+    pb: 1,
+    alignItems: { xs: 'flex-start', md: 'center' },
+  },
+  tabsInnerContainer: { 
+    display: 'flex', 
+    gap: 3, 
+    overflow: 'auto', 
+    width: { xs: '100%', md: 'auto' }, 
+    pb: { xs: 1, md: 0 } 
+  },
+  activeTab: {
+    fontWeight: 600,
+    color: 'primary.main',
+    borderBottom: '2px solid',
+    borderColor: 'primary.main',
+    pb: 1,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  inactiveTab: {
+    color: 'text.secondary',
+    cursor: 'pointer',
+    '&:hover': { color: 'text.primary' },
+    whiteSpace: 'nowrap',
+  },
+  filterContainer: { 
+    ml: { xs: 0, md: 'auto' }, 
+    display: 'flex', 
+    gap: 1, 
+    alignItems: 'center',
+    width: { xs: '100%', md: 'auto' },
+    flexWrap: 'wrap',
+  },
+  filterButtonActive: { 
+    borderRadius: 3, 
+    minWidth: 'auto', 
+    px: 2 
+  },
+  filterButtonInactive: { 
+    borderRadius: 3, 
+    minWidth: 'auto', 
+    px: 2, 
+    color: 'text.secondary' 
+  },
+  addModuleButtonMobile: { 
+    borderRadius: 2, 
+    ml: { xs: 0, md: 2 }, 
+    flexGrow: { xs: 1, md: 0 } 
+  },
+  emptyStateContainer: {
+    textAlign: 'center',
+    py: 8,
+    backgroundColor: 'background.paper',
+    borderRadius: 2,
+    border: '2px dashed',
+    borderColor: 'divider',
+  },
+  emptyStateText: { 
+    mb: 3 
+  },
+  emptyStateActionContainer: { 
+    display: 'flex', 
+    gap: 2, 
+    justifyContent: 'center' 
+  },
+  addModuleButtonBottom: {
+    mt: 2,
+    py: 2,
+    borderStyle: 'dashed',
+    borderWidth: 2,
+    '&:hover': {
+      borderWidth: 2,
+      borderStyle: 'dashed',
+    },
+  },
+  alert: { 
+    width: '100%' 
+  }
 };
