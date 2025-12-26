@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
+
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { InlineEdit } from './InlineEdit';
@@ -46,12 +46,7 @@ export const CurriculumHeader: React.FC<CurriculumHeaderProps> = ({ onUploadClic
   /**
    * Saves the curriculum (currently in-memory only for assignment purposes).
    */
-  const handleSave = () => {
-    // In a real app, this would save to a database
-    // For this assignment, we just show a message
-    console.log('Curriculum saved (in-memory):', curriculum);
-    alert('Curriculum saved successfully! (Note: This is temporary storage as per assignment requirements)');
-  };
+
 
   return (
     <Box sx={styles.container}>
