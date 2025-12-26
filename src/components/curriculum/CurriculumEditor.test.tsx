@@ -10,6 +10,7 @@ import { api } from '../../services/api';
 vi.mock('../../services/api', () => ({
   api: {
     generateCurriculum: vi.fn(),
+    generateCurriculumStream: vi.fn(),
   },
 }));
 
@@ -109,7 +110,13 @@ describe('CurriculumEditor', () => {
         curriculum: { modules: [{ id: 'new', title: 'Generated Module' }] },
         aiProvider: 'Gemini'
     };
-    (api.generateCurriculum as any).mockResolvedValue(mockResult);
+    
+    // Mock the implementation of generateCurriculumStream to simulate success
+    (api.generateCurriculumStream as any).mockImplementation(async () => {
+        // Simulate progress/chunks if needed, or just return the result
+        return mockResult;
+    });
+
 
     renderWithTheme(<CurriculumEditor />);
 
@@ -122,7 +129,7 @@ describe('CurriculumEditor', () => {
     expect(mockSetIsLoading).toHaveBeenCalledWith(true);
     
     await waitFor(() => {
-         expect(api.generateCurriculum).toHaveBeenCalled();
+         expect(api.generateCurriculumStream).toHaveBeenCalled();
     });
 
     expect(mockDispatch).toHaveBeenCalledWith({
@@ -137,7 +144,7 @@ describe('CurriculumEditor', () => {
   it('handles upload errors gracefully', async () => {
     const user = userEvent.setup();
     const errorMsg = 'Upload failed';
-    (api.generateCurriculum as any).mockRejectedValue(new Error(errorMsg));
+    (api.generateCurriculumStream as any).mockRejectedValue(new Error(errorMsg));
 
     renderWithTheme(<CurriculumEditor />);
 
